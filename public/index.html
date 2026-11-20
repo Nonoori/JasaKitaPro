@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JasaKita Pro — Jasa Harian & Langganan Terpercaya</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <!-- Disclaimer Header -->
+  <div class="disclaimer-bar" data-disclaimer>
+    🔒 Keamanan Terjamin: Nomor WhatsApp & alamat pribadi Anda dilindungi enkripsi end-to-end.
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="brand-box">
+        <div class="brand-logo" data-brand-logo>🛡️</div>
+        <div>
+          <div class="brand-title" data-brand-name>JasaKita Pro</div>
+          <span class="brand-slogan" data-brand-slogan>Solusi Jasa Harian & Langganan Terpercaya</span>
+        </div>
+      </a>
+      <div class="nav-links" id="authNavArea">
+        <a href="/mitra.html" class="btn btn-outline btn-sm">Portal Mitra</a>
+        <a href="/superadmin.html" class="btn btn-outline btn-sm">Superadmin</a>
+        <button class="btn btn-primary btn-sm" onclick="openAuthModal('login')">Masuk / Daftar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero & Pencarian Cepat -->
+    <section class="card" style="background: linear-gradient(135deg, #0f766e, #0d9488); color: #fff; border: none;">
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px;">
+        <div style="max-width:640px;">
+          <span class="badge badge-amber" style="margin-bottom:8px;">✓ Terverifikasi • Pembayaran Aman Midtrans • Chat Privat</span>
+          <h1 style="font-size:1.65rem; line-height:1.25; margin-bottom:8px;">Cari Jasa Harian & Paket Langganan Terpercaya di Sekitarmu</h1>
+          <p style="font-size:0.92rem; opacity:0.92; margin-bottom:14px;">
+            Urut & Refleksi, Tukang, Kebon, Listrik, Ledeng, Gojek hingga Langganan Ngaji, Bimbel, Bersih Rumah & Laundry.
+          </p>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="text" id="searchInput" class="input" style="max-width:340px;" placeholder="Cari urut, listrik, guru ngaji, bersih rumah..." oninput="loadCatalog()" />
+            <button class="btn btn-accent" onclick="detectLocation()">📍 Perbarui Jarak Saya</button>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.12); padding:14px; border-radius:14px; font-size:0.84rem; min-width:230px;">
+          <div><strong>📍 Lokasi Aktif:</strong> <span id="userAreaText">Bukittinggi</span></div>
+          <div style="margin-top:4px;"><strong>🛡️ Privasi WA:</strong> Terenkripsi AES-256</div>
+          <div style="margin-top:4px;"><strong>💳 Gateway:</strong> Midtrans QRIS / VA / E-Wallet</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Navigasi Utama User -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('katalog', this)">🔍 Jelajah Jasa</button>
+      <button class="tab-btn" onclick="switchTab('riwayat', this)">📋 Riwayat & Proses</button>
+      <button class="tab-btn" onclick="switchTab('chat', this)">💬 Chat Aman Privat</button>
+      <button class="tab-btn" onclick="switchTab('profil', this)">👤 Profil & Keluhan</button>
+      <button class="tab-btn" onclick="switchTab('info', this)">📜 SNK & FAQ</button>
+    </div>
+
+    <!-- TAB 1: KATALOG JASA (HARIAN & LANGGANAN) -->
+    <section id="tab-katalog">
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+        <button class="btn btn-primary btn-sm" id="filterAll" onclick="setServiceType('')">Semua Layanan</button>
+        <button class="btn btn-outline btn-sm" id="filterHarian" onclick="setServiceType('harian')">⚡ Jasa Harian (Urut, Tukang, Kebon, Listrik, Ledeng, Gojek)</button>
+        <button class="btn btn-outline btn-sm" id="filterLangganan" onclick="setServiceType('langganan')">📅 Jasa Langganan (Ngaji, Bimbel, Bersih Rumah, Laundry)</button>
+      </div>
+
+      <div id="categoryChips" class="tabs" style="margin-bottom:14px;"></div>
+      <div id="servicesGrid" class="grid-3"></div>
+    </section>
+
+    <!-- TAB 2: RIWAYAT, STATUS, PROSES, TIMING & REVIEW BINTANG -->
+    <section id="tab-riwayat" style="display:none;">
+      <div class="card">
+        <h2 style="font-size:1.2rem; margin-bottom:4px;">Riwayat Pesanan, Proses Real-Time & Ulasan</h2>
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:14px;">Pantau status pembayaran Midtrans, estimasi timing kedatangan mitra, dan berikan bintang ulasan.</p>
+        <div id="ordersList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CHAT AMAN PRIVAT & JARAK -->
+    <section id="tab-chat" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-size:1.05rem; margin-bottom:10px;">💬 Kontak Mitra Terproteksi</h3>
+          <p style="font-size:0.8rem; color:var(--muted); margin-bottom:10px;">Nomor WA asli otomatis disamarkan sistem demi privasi Anda.</p>
+          <div id="chatContactsList"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <strong id="chatPartnerName">Pilih Mitra untuk Chat</strong>
+              <div style="font-size:0.78rem; color:var(--primary);" id="chatDistanceBadge"></div>
+            </div>
+            <span class="badge badge-teal">🔒 End-to-End Safe</span>
+          </div>
+          <div class="chat-box" id="chatMessagesBox"></div>
+          <form onsubmit="sendChatMessage(event)" style="display:flex; gap:8px; margin-top:10px;">
+            <input type="text" id="chatInput" class="input" placeholder="Tulis pesan aman (nomor WA otomatis disaring)..." required />
+            <button type="submit" class="btn btn-primary">Kirim</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: PROFIL USER LENGKAP (CRUD, JARAK, WA AMANKAN, KELUHAN & SANDI) -->
+    <section id="tab-profil" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-size:1.1rem; margin-bottom:10px;">👤 Profil Pribadi & Keamanan Data</h3>
+          <form onsubmit="saveUserProfile(event)">
+            <div class="form-group">
+              <label>Nama Lengkap</label>
+              <input type="text" id="profName" class="input" required />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="profEmail" class="input" />
+            </div>
+            <div class="form-group">
+              <label>Nomor WhatsApp (Terenkripsi AES-GCM & Disamarkan di Publik)</label>
+              <input type="text" id="profPhone" class="input" placeholder="0812xxxxxxxx" required />
+            </div>
+            <div class="form-group">
+              <label>Area Kecamatan / Kota (Publik untuk Kalkulasi Jarak)</label>
+              <input type="text" id="profArea" class="input" required />
+            </div>
+            <div class="form-group">
+              <label>Alamat Lengkap Rumah (Dilindungi Enkripsi)</label>
+              <textarea id="profAddress" rows="2" class="input"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Catatan Khusus / Preferensi Layanan</label>
+              <input type="text" id="profNote" class="input" placeholder="Misal: Rumah pagar hitam sebelah masjid" />
+            </div>
+            <hr style="margin:14px 0; border:none; border-top:1px solid var(--border);" />
+            <div class="form-group">
+              <label>Sandi Lama (Isi hanya jika ingin ganti password)</label>
+              <input type="password" id="profOldPass" class="input" placeholder="••••••••" />
+            </div>
+            <div class="form-group">
+              <label>Sandi Baru</label>
+              <input type="password" id="profNewPass" class="input" placeholder="Minimal 6 karakter" />
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">💾 Simpan & Amankan Profil</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:1.1rem; margin-bottom:10px;">🚨 Pusat Keluhan, Masalah & Bantuan</h3>
+          <p style="font-size:0.83rem; color:var(--muted); margin-bottom:12px;">
+            Ada kendala pesanan atau butuh mediasi? Kirim tiket keluhan atau hubungi langsung WhatsApp Superadmin.
+          </p>
+          <form onsubmit="submitComplaint(event)">
+            <div class="form-group">
+              <label>Subjek Masalah / Keluhan</label>
+              <input type="text" id="compSubject" class="input" placeholder="Contoh: Mitra terlambat / Perlu penjadwalan ulang" required />
+            </div>
+            <div class="form-group">
+              <label>Detail Kronologi</label>
+              <textarea id="compDesc" rows="3" class="input" placeholder="Jelaskan detail masalah Anda..." required></textarea>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button type="submit" class="btn btn-primary">Kirim Tiket Keluhan</button>
+              <a data-admin-wa target="_blank" class="btn btn-outline">📲 Chat WA Superadmin (0831-2444-3888)</a>
+            </div>
+          </form>
+          <div id="complaintsHistory" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: SNK & FAQ -->
+    <section id="tab-info" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:10px;">📜 Syarat & Ketentuan (SNK)</h3>
+          <pre id="snkContent" style="white-space:pre-wrap; font-size:0.88rem; color:#334155;"></pre>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:10px;">❓ Pertanyaan Umum (FAQ)</h3>
+          <div id="faqList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL DETAIL JASA, PROFIL TERPERCAYA MITRA, ADD-ON & BOOKING MIDTRANS -->
+  <div class="modal-backdrop" id="serviceModal">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:start; gap:10px; margin-bottom:12px;">
+        <div>
+          <span class="badge badge-teal" id="mTypeBadge">Jasa Harian</span>
+          <span class="badge badge-amber" id="mClassBadge">Reguler</span>
+          <h2 id="mTitle" style="font-size:1.25rem; margin-top:6px;">Judul Layanan</h2>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('serviceModal')">✕</button>
+      </div>
+
+      <!-- Profil Terpercaya Mitra -->
+      <div style="background:#f1f5f9; padding:12px; border-radius:12px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong id="mMitraBiz">Nama Bisnis Mitra</strong>
+          <span class="badge badge-green" id="mVerifiedBadge">✓ Mitra Terverifikasi</span>
+        </div>
+        <div style="font-size:0.8rem; color:var(--muted);" id="mMitraSlogan"></div>
+        <div style="font-size:0.82rem; margin-top:6px;">
+          ⭐ <strong id="mRating">5.0</strong> (<span id="mReviews">0</span> ulasan) • 📍 Jarak: <strong id="mDistance">1.2 km</strong> (<span id="mArea"></span>)
+        </div>
+        <div id="mCerts" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;"></div>
+      </div>
+
+      <p id="mDesc" style="font-size:0.9rem; margin-bottom:10px;"></p>
+      <div style="background:#ecfdf5; border:1px solid #a7f3d0; padding:10px; border-radius:10px; font-size:0.84rem; margin-bottom:14px;">
+        <strong>💡 Solusi yang Diberikan:</strong> <span id="mSolution"></span>
+      </div>
+
+      <form onsubmit="createBooking(event)">
+        <div id="mAddonsArea" style="margin-bottom:12px;"></div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Tanggal Jadwal Layanan</label>
+            <input type="date" id="bookDate" class="input" required />
+          </div>
+          <div class="form-group">
+            <label>Jam Kedatangan / Mulai</label>
+            <input type="time" id="bookTime" class="input" value="09:00" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Catatan Timing / Kebutuhan Khusus</label>
+          <input type="text" id="bookTiming" class="input" placeholder="Contoh: Mohon datang tepat waktu, bawa tangga lipat" />
+        </div>
+
+        <div class="form-group">
+          <label>Metode Pembayaran Terpercaya</label>
+          <select id="bookPayment" class="input">
+            <option value="midtrans">💳 Midtrans Payment Gateway (QRIS, Virtual Account, GoPay, OVO, Dana)</option>
+            <option value="cod_terpercaya">🤝 Bayar di Tempat Setelah Selesai (Terproteksi Sistem)</option>
+          </select>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:#f8fafc; border-radius:12px; margin-bottom:12px;">
+          <span>Total Estimasi (+ Biaya Admin Rp2.500):</span>
+          <strong style="font-size:1.15rem; color:var(--primary);" id="mTotalPrice">Rp0</strong>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-outline" onclick="openChatWithMitra()">💬 Chat Aman Mitra</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">✅ Pesan & Bayar Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL LOGIN / REGISTER -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-box" style="max-width:440px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 id="authTitle">Masuk ke JasaKita Pro</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('authModal')">✕</button>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" id="tabLoginBtn" onclick="toggleAuthMode('login')">Masuk</button>
+        <button class="tab-btn" id="tabRegBtn" onclick="toggleAuthMode('register')">Daftar Baru</button>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email atau Nomor WhatsApp</label>
+          <input type="text" id="loginIdent" class="input" placeholder="budi@example.com atau 0812..." required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" class="input" placeholder="Password Anda" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Masuk Sekarang</button>
+        <div style="margin-top:12px; font-size:0.78rem; color:var(--muted); background:#f1f5f9; padding:10px; border-radius:10px;">
+          <strong>Akun Demo Cepat (Password: <code>demo1234</code>):</strong><br/>
+          • User: <code>budi@example.com</code><br/>
+          • Mitra: <code>hendra.urut@example.com</code><br/>
+          • Superadmin: <code>admin@jasakita.id</code>
+        </div>
+      </form>
+
+      <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Daftar Sebagai</label>
+          <select id="regRole" class="input">
+            <option value="user">Pelanggan (Cari Jasa Harian & Langganan)</option>
+            <option value="mitra">Mitra Penyedia Jasa (Buka Profil Bisnis)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nama Lengkap</label>
+          <input type="text" id="regName" class="input" required />
+        </div>
+        <div class="form-group">
+          <label>Nomor WhatsApp (Otomatis Dienkripsi)</label>
+          <input type="text" id="regPhone" class="input" placeholder="0812xxxxxxxx" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" class="input" />
+        </div>
+        <div class="form-group">
+          <label>Kecamatan / Kota</label>
+          <input type="text" id="regArea" class="input" value="Bukittinggi" required />
+        </div>
+        <div class="form-group">
+          <label>Alamat Lengkap</label>
+          <input type="text" id="regAddr" class="input" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPass" class="input" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Daftar & Amankan Akun</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <h4 style="color:#fff; margin-bottom:8px;" data-brand-name>JasaKita Pro</h4>
+        <p style="font-size:0.84rem;" data-brand-slogan>Solusi Jasa Harian & Langganan Terpercaya di Sekitarmu.</p>
+      </div>
+      <div>
+        <h4 style="color:#fff; margin-bottom:8px;">Layanan Populer</h4>
+        <p style="font-size:0.82rem;">Harian: Urut, Tukang, Kebon, Listrik, Ledeng, Gojek<br/>Langganan: Ngaji, Bimbel, Bersih Rumah, Laundry</p>
+      </div>
+      <div>
+        <h4 style="color:#fff; margin-bottom:8px;">Pusat Bantuan</h4>
+        <a data-admin-wa target="_blank" class="btn btn-primary btn-sm">📲 WhatsApp Superadmin: 0831-2444-3888</a>
+        <p style="font-size:0.78rem; margin-top:10px;" data-copyright>© 2026 JasaKita Pro Indonesia.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-nav">
+    <button class="active" onclick="switchTab('katalog')"><span>🔍</span>Jasa</button>
+    <button onclick="switchTab('riwayat')"><span>📋</span>Riwayat</button>
+    <button onclick="switchTab('chat')"><span>💬</span>Chat</button>
+    <button onclick="switchTab('profil')"><span>👤</span>Profil</button>
+  </nav>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    let currentType = "";
+    let currentCategory = "";
+    let catalogServices = [];
+    let selectedService = null;
+    let activeChatPartnerId = null;
+    let userCoords = { lat: -0.3021, lng: 100.3715 };
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await JK.initGlobal();
+      renderAuthState();
+      renderLegalInfo();
+      document.getElementById("bookDate").value = new Date().toISOString().slice(0, 10);
+      await loadCatalog();
+    });
+
+    function renderAuthState() {
+      const area = document.getElementById("authNavArea");
+      if (JK.user) {
+        document.getElementById("userAreaText").textContent = JK.user.address_area || "Bukittinggi";
+        userCoords = { lat: JK.user.lat || -0.3021, lng: JK.user.lng || 100.3715 };
+        area.innerHTML = `
+          <span class="badge badge-teal">Halo, ${JK.user.full_name}</span>
+          ${JK.user.role === "mitra" ? '<a href="/mitra.html" class="btn btn-primary btn-sm">Dashboard Mitra</a>' : ""}
+          ${JK.user.role === "superadmin" ? '<a href="/superadmin.html" class="btn btn-accent btn-sm">Panel Superadmin</a>' : ""}
+          <button class="btn btn-outline btn-sm" onclick="JK.logout()">Keluar</button>
+        `;
+      }
+    }
+
+    function renderLegalInfo() {
+      document.getElementById("snkContent").textContent = JK.settings.snk_text || "";
+      try {
+        const faqs = JSON.parse(JK.settings.faq_json || "[]");
+        document.getElementById("faqList").innerHTML = faqs
+          .map((f) => `<div style="margin-bottom:12px;"><strong>${f.q}</strong><p style="font-size:0.85rem; color:var(--muted);">${f.a}</p></div>`)
+          .join("");
+      } catch {}
+    }
+
+    function detectLocation() {
+      if (!navigator.geolocation) return alert("Browser tidak mendukung GPS.");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          document.getElementById("userAreaText").textContent = `GPS (${userCoords.lat.toFixed(3)}, ${userCoords.lng.toFixed(3)})`;
+          loadCatalog();
+        },
+        () => alert("Izin lokasi ditolak, menggunakan area profil Anda.")
+      );
+    }
+
+    function setServiceType(t) {
+      currentType = t;
+      document.getElementById("filterAll").className = t === "" ? "btn btn-primary btn-sm" : "btn btn-outline btn-sm";
+      document.getElementById("filterHarian").className = t === "harian" ? "btn btn-primary btn-sm" : "btn btn-outline btn-sm";
+      document.getElementById("filterLangganan").className = t === "langganan" ? "btn btn-primary btn-sm" : "btn btn-outline btn-sm";
+      loadCatalog();
+    }
+
+    function selectCategory(slug) {
+      currentCategory = currentCategory === slug ? "" : slug;
+      loadCatalog();
+    }
+
+    async function loadCatalog() {
+      const q = document.getElementById("searchInput").value;
+      const url = `/api/public/catalog?type=${currentType}&category=${currentCategory}&q=${encodeURIComponent(q)}&lat=${userCoords.lat}&lng=${userCoords.lng}`;
+      const data = await JK.api(url);
+      catalogServices = data.services || [];
+
+      document.getElementById("categoryChips").innerHTML = (data.categories || [])
+        .map(
+          (c) => `<button class="tab-btn ${currentCategory === c.slug ? "active" : ""}" onclick="selectCategory('${c.slug}')">${c.icon} ${c.name}</button>`
+        )
+        .join("");
+
+      const grid = document.getElementById("servicesGrid");
+      if (catalogServices.length === 0) {
+        grid.innerHTML = `<div class="card">Tidak ada layanan yang cocok dengan filter Anda.</div>`;
+        return;
+      }
+
+      grid.innerHTML = catalogServices
+        .map(
+          (s) => `
+          <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:8px;">
+                <span class="badge ${s.service_type === "harian" ? "badge-blue" : "badge-amber"}">
+                  ${s.service_type === "harian" ? "⚡ Jasa Harian" : "📅 Langganan"}
+                </span>
+                <span class="badge badge-teal">📍 ${s.distance_km} km</span>
+              </div>
+              <h3 style="font-size:1.05rem; margin-bottom:4px;">${s.title}</h3>
+              <div style="font-size:0.8rem; color:var(--muted); margin-bottom:8px;">
+                ${s.business_name || s.mitra_name}
+                ${s.verification_status === "verified" ? '<span style="color:var(--success); font-weight:700;"> • ✓ Terpercaya</span>' : ""}
+              </div>
+              <p style="font-size:0.84rem; color:#475569; margin-bottom:10px;">${s.description}</p>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid var(--border); margin-bottom:10px;">
+                <div>
+                  <strong style="color:var(--primary); font-size:1.05rem;">${JK.rupiah(s.price)}</strong>
+                  <span style="font-size:0.76rem; color:var(--muted); display:block;">${s.price_unit}</span>
+                </div>
+                <div style="text-align:right; font-size:0.82rem;">
+                  ⭐ <strong>${s.rating_avg || 5.0}</strong> (${s.total_reviews || 0})
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;" onclick="openServiceDetail(${s.id})">Lihat Detail & Jadwalkan</button>
+            </div>
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    function openServiceDetail(id) {
+      selectedService = catalogServices.find((x) => x.id === id);
+      if (!selectedService) return;
+
+      document.getElementById("mTypeBadge").textContent = selectedService.service_type === "harian" ? "⚡ Jasa Harian" : "📅 Jasa Langganan";
+      document.getElementById("mClassBadge").textContent = `Kelas: ${selectedService.service_class}`;
+      document.getElementById("mTitle").textContent = selectedService.title;
+      document.getElementById("mMitraBiz").textContent = selectedService.business_name || selectedService.mitra_name;
+      document.getElementById("mMitraSlogan").textContent = selectedService.slogan || "";
+      document.getElementById("mVerifiedBadge").textContent =
+        selectedService.verification_status === "verified" ? "✓ Mitra Terverifikasi Resmi" : "Mitra Terdaftar";
+      document.getElementById("mRating").textContent = selectedService.rating_avg || "5.0";
+      document.getElementById("mReviews").textContent = selectedService.total_reviews || 0;
+      document.getElementById("mDistance").textContent = `${selectedService.distance_km} km`;
+      document.getElementById("mArea").textContent = selectedService.address_area || "";
+      document.getElementById("mDesc").textContent = selectedService.description;
+      document.getElementById("mSolution").textContent = selectedService.solution_detail || selectedService.solutions_offered || "-";
+
+      document.getElementById("mCerts").innerHTML = (selectedService.certifications || [])
+        .map((c) => `<span class="badge badge-green">🏅 ${c.title} (${c.year})</span>`)
+        .join("");
+
+      const addonsArea = document.getElementById("mAddonsArea");
+      if (selectedService.addons && selectedService.addons.length > 0) {
+        addonsArea.innerHTML =
+          `<label style="font-size:0.84rem; font-weight:700; display:block; margin-bottom:6px;">➕ Pilih Jasa Add-on Tambahan (Opsional):</label>` +
+          selectedService.addons
+            .map(
+              (a) => `
+              <label style="display:flex; align-items:center; gap:8px; padding:8px; border:1px solid var(--border); border-radius:10px; margin-bottom:6px; cursor:pointer;">
+                <input type="checkbox" class="addon-chk" value="${a.id}" data-price="${a.addon_price}" onchange="recalcTotal()" />
+                <div style="flex:1; font-size:0.83rem;">
+                  <strong>${a.addon_name}</strong> (+${JK.rupiah(a.addon_price)})
+                  <div style="color:var(--muted); font-size:0.76rem;">${a.addon_desc || ""}</div>
+                </div>
+              </label>
+            `
+            )
+            .join("");
+      } else {
+        addonsArea.innerHTML = "";
+      }
+
+      recalcTotal();
+      document.getElementById("serviceModal").classList.add("open");
+    }
+
+    function recalcTotal() {
+      if (!selectedService) return;
+      let total = selectedService.price + 2500;
+      document.querySelectorAll(".addon-chk:checked").forEach((el) => {
+        total += Number(el.dataset.price || 0);
+      });
+      document.getElementById("mTotalPrice").textContent = JK.rupiah(total);
+    }
+
+    async function createBooking(e) {
+      e.preventDefault();
+      if (!JK.user) {
+        closeModal("serviceModal");
+        return openAuthModal("login");
+      }
+      const addon_ids = [...document.querySelectorAll(".addon-chk:checked")].map((el) => Number(el.value));
+      try {
+        const res = await JK.api("/api/orders", {
+          method: "POST",
+          body: JSON.stringify({
+            service_id: selectedService.id,
+            addon_ids,
+            schedule_date: document.getElementById("bookDate").value,
+            schedule_time: document.getElementById("bookTime").value,
+            timing_notes: document.getElementById("bookTiming").value,
+            payment_method: document.getElementById("bookPayment").value,
+          }),
+        });
+        alert(`${res.message}
+Kode Invoice: ${res.order_code}
+Total: ${JK.rupiah(res.total_amount)}`);
+        closeModal("serviceModal");
+        switchTab("riwayat");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function loadOrders() {
+      if (!JK.user) {
+        document.getElementById("ordersList").innerHTML = `<p>Silakan <button class="btn btn-primary btn-sm" onclick="openAuthModal('login')">Masuk</button> untuk melihat riwayat pesanan.</p>`;
+        return;
+      }
+      const data = await JK.api("/api/orders");
+      const list = data.orders || [];
+      if (list.length === 0) {
+        document.getElementById("ordersList").innerHTML = `<p style="color:var(--muted);">Belum ada riwayat pesanan.</p>`;
+        return;
+      }
+      document.getElementById("ordersList").innerHTML = list
+        .map((o) => {
+          const logs = JSON.parse(o.process_log_json || "[]");
+          return `
+          <div style="border:1px solid var(--border); border-radius:14px; padding:14px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+              <div>
+                <strong>${o.order_code}</strong> • <span class="badge badge-teal">${o.order_status.replace(/_/g, " ").toUpperCase()}</span>
+                <span class="badge ${o.payment_status === "paid" ? "badge-green" : "badge-amber"}">${o.payment_status.toUpperCase()}</span>
+              </div>
+              <strong style="color:var(--primary);">${JK.rupiah(o.total_amount)}</strong>
+            </div>
+            <div style="font-size:0.9rem; font-weight:700;">${o.service_title}</div>
+            <div style="font-size:0.82rem; color:var(--muted);">
+              Mitra: ${o.business_name || o.mitra_name} • Jadwal: ${o.schedule_date} (${o.schedule_time}) • Jarak: ${o.distance_km} km
+            </div>
+            <div style="font-size:0.8rem; background:#f8fafc; padding:8px; border-radius:8px; margin-top:8px;">
+              <strong>⏱️ Timeline Proses & Timing:</strong>
+              ${logs.map((l) => `<div>• [${l.time}] ${l.status}</div>`).join("")}
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+              ${
+                o.payment_status !== "paid"
+                  ? `<button class="btn btn-accent btn-sm" onclick="confirmMidtransSim(${o.id})">💳 Konfirmasi Bayar Midtrans</button>`
+                  : ""
+              }
+              <button class="btn btn-outline btn-sm" onclick="startChat(${o.mitra_id})">💬 Chat Mitra</button>
+              ${
+                o.order_status === "selesai" && !o.review_rating
+                  ? `<button class="btn btn-primary btn-sm" onclick="submitReview(${o.id})">⭐ Beri Bintang & Ulasan</button>`
+                  : o.review_rating
+                  ? `<span class="badge badge-amber">⭐ ${o.review_rating}/5: "${o.review_comment}"</span>`
+                  : ""
+              }
+            </div>
+          </div>
+        `;
+        })
+        .join("");
+    }
+
+    async function confirmMidtransSim(orderId) {
+      await JK.api("/api/orders", {
+        method: "PUT",
+        body: JSON.stringify({ order_id: orderId, action: "pay_confirm" }),
+      });
+      alert("Pembayaran Midtrans berhasil dikonfirmasi!");
+      loadOrders();
+    }
+
+    async function submitReview(orderId) {
+      const rating = prompt("Beri nilai bintang (1 - 5):", "5");
+      if (!rating) return;
+      const comment = prompt("Tulis ulasan Anda untuk mitra:", "Pelayanan cepat, ramah, dan terpercaya!");
+      await JK.api("/api/orders", {
+        method: "PUT",
+        body: JSON.stringify({ order_id: orderId, action: "review", rating: Number(rating), comment }),
+      });
+      alert("Ulasan bintang tersimpan!");
+      loadOrders();
+    }
+
+    // Chat Aman Privat
+    function openChatWithMitra() {
+      if (!JK.user) {
+        closeModal("serviceModal");
+        return openAuthModal("login");
+      }
+      const partnerId = selectedService.mitra_id;
+      closeModal("serviceModal");
+      startChat(partnerId);
+    }
+
+    async function startChat(partnerId) {
+      activeChatPartnerId = partnerId;
+      switchTab("chat");
+      await loadChatThread(partnerId);
+    }
+
+    async function loadChatContacts() {
+      if (!JK.user) return;
+      const data = await JK.api("/api/chat/messages");
+      document.getElementById("chatContactsList").innerHTML =
+        (data.contacts || [])
+          .map(
+            (c) => `
+          <div onclick="loadChatThread(${c.id})" style="padding:10px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; cursor:pointer;">
+            <strong>${c.business_name || c.full_name}</strong>
+            <div style="font-size:0.78rem; color:var(--primary);">📍 Jarak: ${c.distance_km} km • ${c.address_area}</div>
+          </div>
+        `
+          )
+          .join("") || `<p style="font-size:0.83rem; color:var(--muted);">Belum ada riwayat chat.</p>`;
+    }
+
+    async function loadChatThread(partnerId) {
+      activeChatPartnerId = partnerId;
+      const data = await JK.api(`/api/chat/messages?partner_id=${partnerId}`);
+      if (data.partner) {
+        document.getElementById("chatPartnerName").textContent = data.partner.business_name || data.partner.full_name;
+        document.getElementById("chatDistanceBadge").textContent = `📍 Jarak real-time: ${data.distance_km} km (${data.partner.address_area})`;
+      }
+      const box = document.getElementById("chatMessagesBox");
+      box.innerHTML = (data.messages || [])
+        .map(
+          (m) => `
+          <div class="msg-bubble ${m.sender_id === JK.user.id ? "msg-mine" : "msg-other"}">
+            <div>${m.text}</div>
+            <div style="font-size:0.68rem; opacity:0.75; margin-top:4px;">${m.distance_info || ""} • ${m.created_at || ""}</div>
+          </div>
+        `
+        )
+        .join("");
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendChatMessage(e) {
+      e.preventDefault();
+      if (!activeChatPartnerId) return alert("Pilih mitra terlebih dahulu.");
+      const input = document.getElementById("chatInput");
+      await JK.api("/api/chat/messages", {
+        method: "POST",
+        body: JSON.stringify({ receiver_id: activeChatPartnerId, text: input.value }),
+      });
+      input.value = "";
+      await loadChatThread(activeChatPartnerId);
+    }
+
+    // Profil User & Keluhan
+    async function loadUserProfile() {
+      if (!JK.user) return;
+      const data = await JK.api("/api/user/profile");
+      const p = data.profile;
+      document.getElementById("profName").value = p.full_name || "";
+      document.getElementById("profEmail").value = p.email || "";
+      document.getElementById("profPhone").value = p.phone || "";
+      document.getElementById("profArea").value = p.address_area || "";
+      document.getElementById("profAddress").value = p.address || "";
+      document.getElementById("profNote").value = p.complaint_note || "";
+
+      document.getElementById("complaintsHistory").innerHTML = (data.complaints || [])
+        .map(
+          (c) => `
+          <div style="padding:10px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; font-size:0.83rem;">
+            <strong>[${c.ticket_code}] ${c.subject}</strong> — <span class="badge badge-amber">${c.status}</span>
+            <p style="margin-top:4px;">${c.description}</p>
+            ${c.admin_reply ? `<div style="color:var(--primary); margin-top:4px;"><strong>Balasan Admin:</strong> ${c.admin_reply}</div>` : ""}
+          </div>
+        `
+        )
+        .join("");
+    }
+
+    async function saveUserProfile(e) {
+      e.preventDefault();
+      try {
+        const res = await JK.api("/api/user/profile", {
+          method: "PUT",
+          body: JSON.stringify({
+            full_name: document.getElementById("profName").value,
+            email: document.getElementById("profEmail").value,
+            phone: document.getElementById("profPhone").value,
+            address_area: document.getElementById("profArea").value,
+            address: document.getElementById("profAddress").value,
+            complaint_note: document.getElementById("profNote").value,
+            old_password: document.getElementById("profOldPass").value,
+            new_password: document.getElementById("profNewPass").value,
+          }),
+        });
+        alert(res.message);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    async function submitComplaint(e) {
+      e.preventDefault();
+      try {
+        const res = await JK.api("/api/user/profile", {
+          method: "POST",
+          body: JSON.stringify({
+            subject: document.getElementById("compSubject").value,
+            description: document.getElementById("compDesc").value,
+          }),
+        });
+        alert(`${res.message} (${res.ticket_code})`);
+        document.getElementById("compSubject").value = "";
+        document.getElementById("compDesc").value = "";
+        loadUserProfile();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Tab Switcher
+    function switchTab(name, btn) {
+      ["katalog", "riwayat", "chat", "profil", "info"].forEach((t) => {
+        document.getElementById("tab-" + t).style.display = t === name ? "block" : "none";
+      });
+      if (btn) {
+        document.querySelectorAll(".tabs .tab-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      }
+      if (name === "riwayat") loadOrders();
+      if (name === "chat") loadChatContacts();
+      if (name === "profil") loadUserProfile();
+    }
+
+    // Auth Modal Handlers
+    function openAuthModal(mode) {
+      document.getElementById("authModal").classList.add("open");
+      toggleAuthMode(mode);
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+    function toggleAuthMode(mode) {
+      document.getElementById("loginForm").style.display = mode === "login" ? "block" : "none";
+      document.getElementById("registerForm").style.display = mode === "register" ? "block" : "none";
+      document.getElementById("tabLoginBtn").classList.toggle("active", mode === "login");
+      document.getElementById("tabRegBtn").classList.toggle("active", mode === "register");
+    }
+    async function handleLogin(e) {
+      e.preventDefault();
+      try {
+        const res = await JK.api("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            identifier: document.getElementById("loginIdent").value,
+            password: document.getElementById("loginPass").value,
+          }),
+        });
+        if (res.user.role === "superadmin") window.location.href = "/superadmin.html";
+        else if (res.user.role === "mitra") window.location.href = "/mitra.html";
+        else window.location.reload();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+    async function handleRegister(e) {
+      e.preventDefault();
+      try {
+        const res = await JK.api("/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            role: document.getElementById("regRole").value,
+            full_name: document.getElementById("regName").value,
+            phone: document.getElementById("regPhone").value,
+            email: document.getElementById("regEmail").value,
+            address_area: document.getElementById("regArea").value,
+            address_detail: document.getElementById("regAddr").value,
+            password: document.getElementById("regPass").value,
+          }),
+        });
+        if (res.user.role === "mitra") window.location.href = "/mitra.html";
+        else window.location.reload();
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  </script>
+</body>
+</html>

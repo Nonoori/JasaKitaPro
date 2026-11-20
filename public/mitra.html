@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Bisnis Mitra — JasaKita Pro</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <div class="disclaimer-bar" data-disclaimer>
+    🛡️ Portal Mitra Terpercaya: Data WA & Alamat Anda dilindungi enkripsi.
+  </div>
+
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="brand-box">
+        <div class="brand-logo" data-brand-logo>🛡️</div>
+        <div>
+          <div class="brand-title"><span data-brand-name>JasaKita Pro</span> • Mitra</div>
+          <span class="brand-slogan">Kelola Profil Bisnis, Jasa, Harga, Sertifikasi & Pesanan</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="/index.html" class="btn btn-outline btn-sm">Beranda User</a>
+        <button class="btn btn-danger btn-sm" onclick="JK.logout()">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="mitraApp">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchMitraTab('orders', this)">📦 Pesanan Masuk & Proses</button>
+      <button class="tab-btn" onclick="switchMitraTab('services', this)">🛠️ Kelola Jasa, Harga & Add-on</button>
+      <button class="tab-btn" onclick="switchMitraTab('profile', this)">🏢 Profil Bisnis, Keahlian & Verifikasi</button>
+      <button class="tab-btn" onclick="switchMitraTab('chat', this)">💬 Chat Pelanggan</button>
+    </div>
+
+    <!-- TAB 1: PESANAN MASUK -->
+    <section id="mtab-orders">
+      <div class="card">
+        <h2 style="font-size:1.15rem; margin-bottom:10px;">📦 Daftar Pesanan Pelanggan & Update Timing Proses</h2>
+        <div id="mitraOrdersList">Memuat pesanan...</div>
+      </div>
+    </section>
+
+    <!-- TAB 2: CRUD JASA, HARGA, KELAS, SOLUSI & ADD-ON -->
+    <section id="mtab-services" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:10px;">➕ Tambah / Edit Layanan Jasa</h3>
+          <form onsubmit="saveMitraService(event)">
+            <input type="hidden" id="srvId" />
+            <div class="form-group">
+              <label>Kategori Layanan</label>
+              <select id="srvCategory" class="input" required></select>
+            </div>
+            <div class="form-group">
+              <label>Tipe Layanan</label>
+              <select id="srvType" class="input">
+                <option value="harian">⚡ Jasa Harian (Per Kunjungan / Sesi)</option>
+                <option value="langganan">📅 Jasa Langganan (Rutin Mingguan / Bulanan)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Nama Paket / Judul Jasa</label>
+              <input type="text" id="srvTitle" class="input" placeholder="Contoh: Urut Badan + Refleksi Full Body" required />
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Kelas Layanan</label>
+                <select id="srvClass" class="input">
+                  <option value="Reguler">Reguler</option>
+                  <option value="VIP / Premium">VIP / Premium</option>
+                  <option value="Keluarga / Paket Bulanan">Keluarga / Paket Bulanan</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Harga (Rp)</label>
+                <input type="number" id="srvPrice" class="input" placeholder="95000" required />
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Satuan Harga</label>
+                <input type="text" id="srvUnit" class="input" value="per sesi (90 menit)" required />
+              </div>
+              <div class="form-group">
+                <label>Jadwal Rutin (Jika Langganan)</label>
+                <input type="text" id="srvSubDays" class="input" placeholder="Selasa & Jumat 16.30" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Deskripsi Detail Jasa</label>
+              <textarea id="srvDesc" rows="2" class="input" required></textarea>
+            </div>
+            <div class="form-group">
+              <label>Solusi yang Diberikan kepada Pelanggan</label>
+              <textarea id="srvSolution" rows="2" class="input" placeholder="Jelaskan masalah yang teratasi & keunggulan metode Anda"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">💾 Simpan Layanan</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">📋 Daftar Jasa & Jasa Add-on Anda</h3>
+          <div id="mitraServicesList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: PROFIL BISNIS, KEAHLIAN, SERTIFIKASI & VERIFIKASI -->
+    <section id="mtab-profile" style="display:none;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h2>🏢 Profil Bisnis Terpercaya & Keahlian</h2>
+          <span class="badge badge-green" id="mitraVerifStatus">Status: Pending</span>
+        </div>
+        <form onsubmit="saveMitraProfile(event)">
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Nama Bisnis / Usaha Jasa</label>
+              <input type="text" id="mpBizName" class="input" required />
+            </div>
+            <div class="form-group">
+              <label>Slogan Bisnis</label>
+              <input type="text" id="mpSlogan" class="input" />
+            </div>
+            <div class="form-group">
+              <label>URL Foto Profil Bisnis / Bengkel / Klinik</label>
+              <input type="text" id="mpPhoto" class="input" placeholder="https://..." />
+            </div>
+            <div class="form-group">
+              <label>Radius Layanan (KM)</label>
+              <input type="number" step="0.5" id="mpRadius" class="input" value="5" />
+            </div>
+            <div class="form-group">
+              <label>Nomor WhatsApp Bisnis (Diamankan Enkripsi AES-GCM)</label>
+              <input type="text" id="mpPhone" class="input" required />
+            </div>
+            <div class="form-group">
+              <label>Area Kecamatan / Kota</label>
+              <input type="text" id="mpArea" class="input" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Alamat Lengkap Usaha (Terproteksi)</label>
+            <input type="text" id="mpAddress" class="input" />
+          </div>
+          <div class="form-group">
+            <label>Daftar Keahlian (Pisahkan dengan koma)</label>
+            <input type="text" id="mpSkills" class="input" placeholder="Urut Badan, Refleksi, Bekam Steril" />
+          </div>
+          <div class="form-group">
+            <label>Sertifikasi & Lisensi (Format: Nama Sertifikat | Penerbit | Tahun per baris)</label>
+            <textarea id="mpCerts" rows="3" class="input" placeholder="Sertifikat Terapis PBI | Perkumpulan Bekam Indonesia | 2024"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Solusi Utama yang Diberikan</label>
+            <textarea id="mpSolutions" rows="2" class="input"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Link Dokumen Verifikasi (KTP / Sertifikat Keahlian untuk Validasi Superadmin)</label>
+            <input type="text" id="mpVerifDoc" class="input" placeholder="https://drive.google.com/..." />
+          </div>
+          <button type="submit" class="btn btn-primary">💾 Simpan Profil Bisnis & Ajukan Verifikasi</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 4: CHAT PELANGGAN -->
+    <section id="mtab-chat" style="display:none;">
+      <div class="grid-2">
+        <div class="card">
+          <h3>💬 Pelanggan yang Menghubungi</h3>
+          <div id="mChatContacts"></div>
+        </div>
+        <div class="card">
+          <strong id="mChatTitle">Pilih Pelanggan</strong>
+          <div style="font-size:0.78rem; color:var(--primary); margin-bottom:8px;" id="mChatDist"></div>
+          <div class="chat-box" id="mChatBox"></div>
+          <form onsubmit="sendMitraChat(event)" style="display:flex; gap:8px; margin-top:10px;">
+            <input type="text" id="mChatInput" class="input" placeholder="Balas pelanggan dengan aman..." required />
+            <button type="submit" class="btn btn-primary">Kirim</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/app.js"></script>
+  <script>
+    let mitraData = null;
+    let activeCustomerId = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await JK.initGlobal();
+      if (!JK.user || (JK.user.role !== "mitra" && JK.user.role !== "superadmin")) {
+        alert("Silakan login sebagai Mitra terlebih dahulu.");
+        window.location.href = "/index.html";
+        return;
+      }
+      await loadMitraDashboard();
+      await loadMitraOrders();
+    });
+
+    async function loadMitraDashboard() {
+      mitraData = await JK.api("/api/mitra/dashboard");
+      const { user, profile, services, addons, categories } = mitraData;
+
+      document.getElementById("srvCategory").innerHTML = categories
+        .map((c) => `<option value="${c.id}">${c.icon} ${c.name} (${c.service_type})</option>`)
+        .join("");
+
+      document.getElementById("mitraVerifStatus").textContent = `Verifikasi: ${profile.verification_status.toUpperCase()}`;
+      document.getElementById("mpBizName").value = profile.business_name || "";
+      document.getElementById("mpSlogan").value = profile.slogan || "";
+      document.getElementById("mpPhoto").value = profile.business_photo || "";
+      document.getElementById("mpRadius").value = profile.service_radius_km || 5;
+      document.getElementById("mpPhone").value = user.phone || "";
+      document.getElementById("mpArea").value = user.address_area || "";
+      document.getElementById("mpAddress").value = user.address || "";
+      document.getElementById("mpSkills").value = (profile.skills || []).join(", ");
+      document.getElementById("mpCerts").value = (profile.certifications || [])
+        .map((c) => `${c.title} | ${c.issuer} | ${c.year}`)
+        .join("
+");
+      document.getElementById("mpSolutions").value = profile.solutions_offered || "";
+      document.getElementById("mpVerifDoc").value = profile.verification_doc_url || "";
+
+      document.getElementById("mitraServicesList").innerHTML =
+        services
+          .map((s) => {
+            const srvAddons = addons.filter((a) => a.service_id === s.id);
+            return `
+            <div style="border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:start;">
+                <div>
+                  <span class="badge badge-teal">${s.service_type.toUpperCase()}</span>
+                  <span class="badge badge-amber">${s.service_class}</span>
+                  <h4 style="margin-top:4px;">${s.title}</h4>
+                  <strong style="color:var(--primary);">${JK.rupiah(s.price)}</strong> <span style="font-size:0.8rem;">${s.price_unit}</span>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="deleteMitraService(${s.id})">Hapus</button>
+              </div>
+              <div style="margin-top:8px; font-size:0.8rem; background:#f8fafc; padding:8px; border-radius:8px;">
+                <strong>Jasa Add-on:</strong>
+                ${srvAddons.map((a) => `<div>• ${a.addon_name} (+${JK.rupiah(a.addon_price)}) <a href="#" onclick="deleteAddon(${a.id});return false;" style="color:red;">[x]</a></div>`).join("") || " Belum ada"}
+                <div style="margin-top:6px;">
+                  <button class="btn btn-outline btn-sm" onclick="addAddonPrompt(${s.id})">+ Tambah Add-on</button>
+                </div>
+              </div>
+            </div>
+          `;
+          })
+          .join("") || `<p>Belum ada layanan.</p>`;
+    }
+
+    async function saveMitraProfile(e) {
+      e.preventDefault();
+      const certs = document
+        .getElementById("mpCerts")
+        .value.split("
+")
+        .filter(Boolean)
+        .map((line) => {
+          const [title = "", issuer = "-", year = "2026"] = line.split("|").map((x) => x.trim());
+          return { title, issuer, year };
+        });
+
+      const res = await JK.api("/api/mitra/dashboard", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "update_profile",
+          business_name: document.getElementById("mpBizName").value,
+          slogan: document.getElementById("mpSlogan").value,
+          business_photo: document.getElementById("mpPhoto").value,
+          service_radius_km: document.getElementById("mpRadius").value,
+          phone: document.getElementById("mpPhone").value,
+          address_area: document.getElementById("mpArea").value,
+          address: document.getElementById("mpAddress").value,
+          skills: document.getElementById("mpSkills").value.split(",").map((x) => x.trim()).filter(Boolean),
+          certifications: certs,
+          solutions_offered: document.getElementById("mpSolutions").value,
+          verification_doc_url: document.getElementById("mpVerifDoc").value,
+        }),
+      });
+      alert(res.message);
+      loadMitraDashboard();
+    }
+
+    async function saveMitraService(e) {
+      e.preventDefault();
+      const res = await JK.api("/api/mitra/dashboard", {
+        method: "POST",
+        body: JSON.stringify({
+          action: "save_service",
+          id: document.getElementById("srvId").value || null,
+          category_id: Number(document.getElementById("srvCategory").value),
+          service_type: document.getElementById("srvType").value,
+          title: document.getElementById("srvTitle").value,
+          service_class: document.getElementById("srvClass").value,
+          price: Number(document.getElementById("srvPrice").value),
+          price_unit: document.getElementById("srvUnit").value,
+          subscription_days: document.getElementById("srvSubDays").value,
+          description: document.getElementById("srvDesc").value,
+          solution_detail: document.getElementById("srvSolution").value,
+        }),
+      });
+      alert(res.message);
+      e.target.reset();
+      loadMitraDashboard();
+    }
+
+    async function deleteMitraService(id) {
+      if (!confirm("Hapus layanan ini?")) return;
+      await JK.api("/api/mitra/dashboard", { method: "POST", body: JSON.stringify({ action: "delete_service", id }) });
+      loadMitraDashboard();
+    }
+
+    async function addAddonPrompt(serviceId) {
+      const addon_name = prompt("Nama Jasa Add-on (contoh: Bekam 7 Titik / Material Kabel):");
+      if (!addon_name) return;
+      const addon_price = prompt("Harga Tambahan (Rp):", "35000");
+      const addon_desc = prompt("Keterangan singkat Add-on:", "");
+      await JK.api("/api/mitra/dashboard", {
+        method: "POST",
+        body: JSON.stringify({ action: "save_addon", service_id: serviceId, addon_name, addon_price: Number(addon_price), addon_desc }),
+      });
+      loadMitraDashboard();
+    }
+
+    async function deleteAddon(id) {
+      await JK.api("/api/mitra/dashboard", { method: "POST", body: JSON.stringify({ action: "delete_addon", id }) });
+      loadMitraDashboard();
+    }
+
+    async function loadMitraOrders() {
+      const data = await JK.api("/api/orders");
+      document.getElementById("mitraOrdersList").innerHTML =
+        (data.orders || [])
+          .map(
+            (o) => `
+          <div style="border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+              <strong>${o.order_code} • ${o.service_title}</strong>
+              <span class="badge badge-teal">${o.order_status.toUpperCase()}</span>
+            </div>
+            <div style="font-size:0.83rem; color:var(--muted); margin:4px 0;">
+              Pelanggan: ${o.customer_name} • Jadwal: ${o.schedule_date} (${o.schedule_time}) • Jarak: ${o.distance_km} km • Total: <strong>${JK.rupiah(o.total_amount)}</strong>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+              <button class="btn btn-outline btn-sm" onclick="updateOrderProc(${o.id}, 'mitra_menuju_lokasi')">🛵 Menuju Lokasi</button>
+              <button class="btn btn-outline btn-sm" onclick="updateOrderProc(${o.id}, 'sedang_dikerjakan')">🛠️ Sedang Dikerjakan</button>
+              <button class="btn btn-primary btn-sm" onclick="updateOrderProc(${o.id}, 'selesai')">✅ Tandai Selesai</button>
+              <button class="btn btn-outline btn-sm" onclick="openMitraChat(${o.user_id})">💬 Chat Pelanggan</button>
+            </div>
+          </div>
+        `
+          )
+          .join("") || `<p>Belum ada pesanan masuk.</p>`;
+    }
+
+    async function updateOrderProc(orderId, newStatus) {
+      await JK.api("/api/orders", {
+        method: "PUT",
+        body: JSON.stringify({ order_id: orderId, action: "update_status", new_status: newStatus }),
+      });
+      loadMitraOrders();
+    }
+
+    async function openMitraChat(custId) {
+      activeCustomerId = custId;
+      switchMitraTab("chat");
+      const data = await JK.api(`/api/chat/messages?partner_id=${custId}`);
+      if (data.partner) {
+        document.getElementById("mChatTitle").textContent = data.partner.full_name;
+        document.getElementById("mChatDist").textContent = `📍 Jarak ke Pelanggan: ${data.distance_km} km`;
+      }
+      document.getElementById("mChatBox").innerHTML = (data.messages || [])
+        .map(
+          (m) => `<div class="msg-bubble ${m.sender_id === JK.user.id ? "msg-mine" : "msg-other"}">${m.text}</div>`
+        )
+        .join("");
+    }
+
+    async function sendMitraChat(e) {
+      e.preventDefault();
+      if (!activeCustomerId) return;
+      const inp = document.getElementById("mChatInput");
+      await JK.api("/api/chat/messages", {
+        method: "POST",
+        body: JSON.stringify({ receiver_id: activeCustomerId, text: inp.value }),
+      });
+      inp.value = "";
+      openMitraChat(activeCustomerId);
+    }
+
+    function switchMitraTab(name, btn) {
+      ["orders", "services", "profile", "chat"].forEach((t) => {
+        document.getElementById("mtab-" + t).style.display = t === name ? "block" : "none";
+      });
+      if (btn) {
+        document.querySelectorAll(".tabs .tab-btn").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      }
+    }
+  </script>
+</body>
+</html>
