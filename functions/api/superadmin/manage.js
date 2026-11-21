@@ -86,13 +86,11 @@ export async function onRequestPost({ request, env }) {
       return jsonResponse({ ok: true, message: "Kategori dihapus." });
     }
 
-
     if (action === "save_plan") {
   const { id, name, target_role, price, duration_days, benefits } = body;
   const benefitsJson = JSON.stringify(
     Array.isArray(benefits) ? benefits : String(benefits || "").split(/\r?\n/).filter(Boolean)
   );
-
       if (id) {
         await env.DB.prepare(
           "UPDATE subscription_plans SET name=?, target_role=?, price=?, duration_days=?, benefits_json=? WHERE id=?"
