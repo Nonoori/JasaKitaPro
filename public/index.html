@@ -549,9 +549,8 @@
             payment_method: document.getElementById("bookPayment").value,
           }),
         });
-        alert(`${res.message}
-Kode Invoice: ${res.order_code}
-Total: ${JK.rupiah(res.total_amount)}`);
+        alert(`${res.message}\nKode Invoice: ${res.order_code}\nTotal: ${JK.rupiah(res.total_amount)}`);
+
         closeModal("serviceModal");
         switchTab("riwayat");
       } catch (err) {

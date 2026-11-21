@@ -221,9 +221,8 @@
       document.getElementById("mpAddress").value = user.address || "";
       document.getElementById("mpSkills").value = (profile.skills || []).join(", ");
       document.getElementById("mpCerts").value = (profile.certifications || [])
-        .map((c) => `${c.title} | ${c.issuer} | ${c.year}`)
-        .join("
-");
+  .map((c) => `${c.title} | ${c.issuer} \vert{}${c.year}`)
+  .join("\n");
       document.getElementById("mpSolutions").value = profile.solutions_offered || "";
       document.getElementById("mpVerifDoc").value = profile.verification_doc_url || "";
 
@@ -258,10 +257,9 @@
     async function saveMitraProfile(e) {
       e.preventDefault();
       const certs = document
-        .getElementById("mpCerts")
-        .value.split("
-")
-        .filter(Boolean)
+  .getElementById("mpCerts")
+  .value.split(/\r?\n/)
+  .filter(Boolean)
         .map((line) => {
           const [title = "", issuer = "-", year = "2026"] = line.split("|").map((x) => x.trim());
           return { title, issuer, year };
